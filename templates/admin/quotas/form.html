@@ -1,0 +1,39 @@
+{% extends "admin/master.html" %}
+{% block body %}
+<div class="container-fluid">
+    <h3 class="mb-3">{{ '➕ Создать' if action == 'add' else '✏️ Редактировать' }} квоту</h3>
+    <form method="post" class="bg-white p-4 rounded shadow-sm">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-3">
+            <div class="col-md-4"><label class="form-label fw-bold">User ID</label><input type="number" name="user_id" class="form-control" value="{{ record.user_id if record else '' }}" required></div>
+            <div class="col-md-2"><label class="form-label fw-bold">Оплачено</label><input type="number" name="paid_credits" class="form-control" value="{{ record.paid_credits if record else 0 }}"></div>
+            <div class="col-md-2"><label class="form-label fw-bold">Исп. плат</label><input type="number" name="paid_used" class="form-control" value="{{ record.paid_used if record else 0 }}"></div>
+            <div class="col-md-2"><label class="form-label fw-bold">Исп. бесплатно</label><input type="number" name="free_used" class="form-control" value="{{ record.free_used if record else 0 }}"></div>
+            <div class="col-md-2"><label class="form-label fw-bold">Лимит бесплатно</label><input type="number" name="free_limit" class="form-control" value="{{ record.free_limit if record else 0 }}"></div>
+            <div class="col-md-2"><label class="form-label fw-bold">Безлимит</label>
+                <select name="is_unlimited" class="form-select">
+                    <option value="0" {% if record and record.is_unlimited == 0 %}selected{% endif %}>Нет</option>
+                    <option value="1" {% if record and record.is_unlimited == 1 %}selected{% endif %}>Да</option>
+                </select>
+            </div>
+            <div class="col-md-2"><label class="form-label fw-bold">Бан</label>
+                <select name="is_banned" class="form-select">
+                    <option value="0" {% if record and record.is_banned == 0 %}selected{% endif %}>Нет</option>
+                    <option value="1" {% if record and record.is_banned == 1 %}selected{% endif %}>Да</option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button class="btn btn-success">{{ 'Создать' if action == 'add' else 'Сохранить' }}</button>
+            <a href="{{ url_for('.index') }}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
