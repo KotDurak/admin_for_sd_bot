@@ -1,0 +1,140 @@
+{% extends "admin/master.html" %}
+{% block body %}
+<div class="container-fluid">
+    <!-- Заголовок + Фильтр периода -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>🌌 Панель управления</h3>
+        <form class="form-inline">
+            <label class="mr-2 mb-0">Период:</label>
+            <select class="form-control form-control-sm" onchange="location.search='?days='+this.value">
+                <option value="7" {% if selected_days==7 %}selected{% endif %}>7 дней</option>
+                <option value="30" {% if selected_days==30 %}selected{% endif %}>30 дней</option>
+                <option value="90" {% if selected_days==90 %}selected{% endif %}>90 дней</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- 📊 Карточки-метрики -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h6 class="card-title">👥 Всего пользователей</h6>
+                    <h2 class="mb-0">{{ stats.total_users }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h6 class="card-title">📈 Запросов сегодня</h6>
+                    <h2 class="mb-0">{{ stats.requests_today }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h6 class="card-title">🎨 Топ-модель</h6>
+                    <h2 class="mb-0 small">{{ stats.top_model }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h6 class="card-title">📢 Активных кампаний</h6>
+                    <h2 class="mb-0">{{ stats.active_campaigns }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📉 График запросов -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">📊 Динамика генераций</div>
+        <div class="card-body" style="height: 350px;">
+            <canvas id="historyChart"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 🎯 Топ моделей -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">🎨 Топ-5 моделей</div>
+                <div class="card-body" style="height: 300px;">
+                    <canvas id="modelsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📢 Статус рекламы -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-light">📋 Рекламные кампании</div>
+                <div class="card-body">
+                    <table class="table table-sm table-hover">
+                        <thead><tr><th>Название</th><th>Остаток</th><th>Статус</th></tr></thead>
+                        <tbody>
+                            {% for c in stats.campaigns %}
+                            <tr>
+                                <td>{{ c.title }}</td>
+                                <td>
+                                    <div class="progress" style="height: 6px;">
+                                        {% set pct = (c.remaining / c.total_sold * 100) if c.total_sold > 0 else 0 %}
+                                        <div class="progress-bar bg-{% if pct > 50 %}success{% elif pct > 20 %}warning{% else %}danger{% endif %}" style="width: {{ pct }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ c.remaining }}/{{ c.total_sold }}</small>
+                                </td>
+                                <td>{{ '✅' if c.is_active else '⏸️' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3" class="text-center text-muted">Нет активных кампаний</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // 📈 График истории
+    const historyCtx = document.getElementById('historyChart').getContext('2d');
+    new Chart(historyCtx, {
+        type: 'line',
+        data: {
+            labels: {{ stats.history | map(attribute='day') | list | tojson }},
+            datasets: [{
+                label: 'Запросов',
+                data: {{ stats.history | map(attribute='count') | list | tojson }},
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
+
+    // 🎨 График моделей
+    const modelsCtx = document.getElementById('modelsChart').getContext('2d');
+    new Chart(modelsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ stats.top_models | map(attribute='name') | list | tojson }},
+            datasets: [{
+                label: 'Генераций',
+                data: {{ stats.top_models | map(attribute='count') | list | tojson }},
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
+</script>
+{% endblock %}

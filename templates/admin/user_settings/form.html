@@ -1,0 +1,80 @@
+{% extends "admin/master.html" %}
+{% block body %}
+<div class="container-fluid">
+    <h3 class="mb-3">{{ '➕ Создать' if action == 'add' else '✏️ Редактировать' }} пользователя</h3>
+    
+    <form method="post" class="bg-white p-4 rounded shadow-sm">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-3">
+            <!-- User ID (только при создании) -->
+            {% if action == 'add' %}
+            <div class="col-md-3">
+                <label class="form-label fw-bold">User ID *</label>
+                <input type="number" name="user_id" class="form-control" 
+                       value="{{ record.user_id if record else '' }}" required>
+            </div>
+            {% endif %}
+            
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Никнейм</label>
+                <input type="text" name="username" class="form-control" 
+                       value="{{ record.username if record else '' }}" maxlength="100">
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Модель</label>
+                <input type="text" name="model" class="form-control" 
+                       value="{{ record.model if record else '' }}" list="models-list" placeholder="sd_xl_base_1.0.safetensors">
+                <datalist id="models-list">
+                    <option value="sd_xl_base_1.0.safetensors">
+                    <option value="juggernautXL_v8Rundiffusion.safetensors">
+                    <option value="realisticVisionV60B1_v51VAE.safetensors">
+                </datalist>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Пресет</label>
+                <input type="text" name="preset" class="form-control" 
+                       value="{{ record.preset if record else '' }}" maxlength="50" placeholder="anime_v1">
+            </div>
+            
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Запросов</label>
+                <input type="number" name="requests_count" class="form-control" 
+                       value="{{ record.requests_count if record else 0 }}" min="0">
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Последний запрос</label>
+                <input type="datetime-local" name="last_request_at" class="form-control" 
+                       value="{{ record.last_request_at[:16] if record and record.last_request_at else '' }}">
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label fw-bold">VAE путь</label>
+                <input type="text" name="vae" class="form-control" 
+                       value="{{ record.vae if record else '' }}" placeholder="vae/kl-f8-anime2.ckpt">
+            </div>
+            
+            <div class="col-12">
+                <label class="form-label fw-bold">LoRA строка</label>
+                <textarea name="lora_string" class="form-control" rows="2" 
+                          placeholder="<lora:animeDetail_v13:0.8>, <lora:character_xl:0.6>">{{ record.lora_string if record else '' }}</textarea>
+                <small class="text-muted">Формат: <code>&lt;lora:name:weight&gt;</code>, разделённые запятыми</small>
+            </div>
+        </div>
+        
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-success">{{ 'Создать' if action == 'add' else 'Сохранить' }}</button>
+            <a href="{{ url_for('.index') }}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

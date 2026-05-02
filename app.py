@@ -4,7 +4,14 @@ from flask_admin import Admin, AdminIndexView, expose
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 import config
 from routes.quotas import QuotasView
-# from routes.generations import GenerationsView  # ← так будешь подключать новые модули
+from routes.user_settings import UserSettingsView
+from views import GenerationRequestView, UserPresetView, StarPaymentView
+from views import (
+     UserPresetView, StarPaymentView,
+    GenerationRequestView,
+    AdCampaignView, AdImpressionLogView, MigrationView)
+from routes.dashboard import DashboardView
+
 
 def create_app():
     app = Flask(__name__)
@@ -25,7 +32,7 @@ def create_app():
         @expose("/")
         def index(self):
             if not current_user.is_authenticated: return redirect(url_for(".login_view"))
-            return redirect(url_for("quotas_view.index"))  # ← дефолтная страница
+            return redirect(url_for("dashboard_view.index"))  # ← дефолтная страница
         @expose("/login/", methods=["GET", "POST"])
         def login_view(self):
             if request.method == "POST":
@@ -43,6 +50,7 @@ def create_app():
 
     # 1️⃣ Кастомный модуль (Raw SQL)
     admin.add_view(QuotasView(name="📊 Квоты", endpoint="quotas_view"))
+    admin.add_view(UserSettingsView(name="👥 Пользователи", endpoint="usersettings_custom"))
 
     # 2️⃣ Возвращаем стандартные Peewee-таблицы
     from models import UserSettings, UserPreset, GenerationRequest, StarPayment, AdCampaign, AdImpressionLog, Migration
@@ -53,13 +61,18 @@ def create_app():
 
         def inaccessible_callback(self, name, **kwargs): return redirect(url_for("admin.login_view"))
 
-    admin.add_view(SafeModelView(UserSettings, name="👤 Пользователи", endpoint="usersettings_view"))
-    admin.add_view(SafeModelView(UserPreset, name="⚙️ Пресеты", endpoint="userpreset_view"))
-    admin.add_view(SafeModelView(GenerationRequest, name="🔄 Запросы", endpoint="generationrequest_view"))
-    admin.add_view(SafeModelView(StarPayment, name="💰 Платежи", endpoint="starpayment_view"))
-    admin.add_view(SafeModelView(AdCampaign, name="📢 Реклама", endpoint="adcampaign_view"))
-    admin.add_view(SafeModelView(AdImpressionLog, name="📈 Лог показов", endpoint="adimpression_view"))
-    admin.add_view(SafeModelView(Migration, name="🔧 Миграции", endpoint="migration_view"))
+    admin.add_view(AdCampaignView(AdCampaign, name="📢 Реклама", endpoint="adcampaign_view"))
+    admin.add_view(AdImpressionLogView(AdImpressionLog, name="📋 Лог показов", endpoint="adimpression_view"))
+    admin.add_view(StarPaymentView(StarPayment, name="💰 Платежи", endpoint="payment_view"))
+    # 🎨 Пресеты
+    admin.add_view(UserPresetView(UserPreset, name="🎨 Пресеты", endpoint="userpreset_view"))
+    # 📈 Запросы
+    admin.add_view(GenerationRequestView(GenerationRequest, name="📈 Запросы", endpoint="generation_view"))
+    # 👥 Пользователи (стандартная вьюха, если нужна)
+    #admin.add_view(UserSettingsView(UserSettings, name="👥 Пользователи (станд.)", endpoint="usersettings_std"))
+    # 🗂️ Миграции
+    admin.add_view(MigrationView(Migration, name="🗂️ Миграции", endpoint="migration_view"))
+    admin.add_view(DashboardView(name="🌌 Дашборд", endpoint="dashboard_view"))
 
     return app
 
