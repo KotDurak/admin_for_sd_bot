@@ -43,8 +43,8 @@
             <thead class="table-dark">
                 <tr>
                     <th>ID</th><th>User ID</th><th>Ник</th><th>Модель</th>
-                    <th>Пресет</th><th>Запросов</th><th>Последний</th><th>VAE</th><th>Действия</th>
-                    <th>Запросов</th><th>Последний</th>
+                    <th>Пресет</th><th>Последний</th><th>VAE</th><th>Генерации</th>
+                    <th>Запросов</th><th>Действич</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,8 +55,7 @@
                     <td>{{ r.username or '—' }}</td>
                     <td><small class="text-muted">{{ r.model or '—' }}</small></td>
                     <td>{{ r.preset or '—' }}</td>
-                    <td>{{ r.requests_count }}</td>
-                    <td><small>{{ r.last_request_at[:16] if r.last_request_at else '—' }}</small></td>
+                    <td><small>{{ r.last_gen_at[:16] if r.last_gen_at else '—' }}</small></td>
                     <td><small class="text-muted">{{ '✓' if r.vae else '—' }}</small></td>
                     <td>{{ r.total_requests }}</td>
                     <td><small>{{ r.last_gen_at[:16] if r.last_gen_at else '—' }}</small></td>
