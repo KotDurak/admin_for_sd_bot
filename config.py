@@ -26,3 +26,6 @@ if not DB_PATH.exists():
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 print(f"✅ Конфиг загружен. БД: {DB_PATH}")
+
+ADMIN_TELEGRAM_TOKEN = os.getenv("ADMIN_TELEGRAM_TOKEN", "t")
+ADMIN_TELEGRAM_CHAT_ID =  os.getenv("ADMIN_TELEGRAM_CHAT_ID", "t")

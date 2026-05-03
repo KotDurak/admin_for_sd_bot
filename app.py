@@ -49,6 +49,12 @@ def create_app():
 
     admin = Admin(app, name="🎨 AnimeGen Admin", index_view=MyAdminIndexView(), template_mode="bootstrap4")
 
+    @app.route("/")
+    def root_redirect():
+        """Перенаправляет с корня на админку"""
+        from flask import redirect, url_for
+        return redirect(url_for("admin.index"))
+
     # 1️⃣ Кастомный модуль (Raw SQL)
     admin.add_view(QuotasView(name="📊 Квоты", endpoint="quotas_view"))
     admin.add_view(UserSettingsView(name="👥 Пользователи", endpoint="usersettings_custom"))
