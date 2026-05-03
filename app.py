@@ -4,6 +4,7 @@ from flask_admin import Admin, AdminIndexView, expose
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 import config
 from routes.quotas import QuotasView
+from routes.system_monitor import SystemMonitorView
 from routes.user_settings import UserSettingsView
 from views import GenerationRequestView, UserPresetView, StarPaymentView
 from views import (
@@ -73,6 +74,7 @@ def create_app():
     # 🗂️ Миграции
     admin.add_view(MigrationView(Migration, name="🗂️ Миграции", endpoint="migration_view"))
     admin.add_view(DashboardView(name="🌌 Дашборд", endpoint="dashboard_view"))
+    admin.add_view(SystemMonitorView(name="🖥️ Мониторинг", endpoint="system_monitor"))
 
     return app
 
