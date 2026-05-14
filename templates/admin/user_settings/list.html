@@ -60,8 +60,8 @@
                     <td>{{ r.total_requests }}</td>
                     <td><small>{{ r.last_gen_at[:16] if r.last_gen_at else '—' }}</small></td>
                     <td>
-                        <a href="{{ url_for('.edit', setting_id=r.id) }}" class="btn btn-sm btn-warning">✏️</a>
-                        <form method="post" action="{{ url_for('.delete', setting_id=r.id) }}" 
+                        <a href="{{ url_for('.edit', setting_id=r.user_id) }}" class="btn btn-sm btn-warning">✏️</a>
+                        <form method="post" action="{{ url_for('.delete', setting_id=r.user_id) }}"
                               class="d-inline" onsubmit="return confirm('Удалить?');">
                             <button class="btn btn-sm btn-danger">🗑️</button>
                         </form>

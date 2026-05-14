@@ -69,7 +69,7 @@ class StarPaymentView(BaseSafeModelView):
 class GenerationRequestView(BaseSafeModelView):
     column_searchable_list = ['user', 'prompt']  # ✅ user — VARCHAR(20), prompt — TEXT
     column_filters = ['user', 'model_used', 'preset_used', 'status', 'created_at']
-    column_list = ['id', 'user', 'model_used', 'preset_used', 'status', 'generation_time_sec', 'created_at']
+    column_list = ['id', 'user', 'model_used', 'prompt', 'preset_used', 'status', 'generation_time_sec', 'created_at']
     column_default_sort = ('created_at', True)
 
     can_create = False

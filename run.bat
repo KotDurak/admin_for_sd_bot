@@ -1,10 +1,10 @@
-@echo off
+﻿@echo off
 title 🌌 AnimeGen Admin Panel
 chcp 65001 >nul 2>&1
 cd /d "%~dp0"
 
 :: 🎛️ НАСТРОЙКИ
-set USE_TUNNEL=true
+set USE_TUNNEL=false
 set TUNNEL_SCRIPT=scripts\run_tunnel.py
 set CLOUDFLARED_PATH=C:\tools\cloudflared\cloudflared.exe
 set ADMIN_PORT=5001

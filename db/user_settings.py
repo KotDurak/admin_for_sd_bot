@@ -31,7 +31,7 @@ def get_user_settings(page=1, per_page=20, search="", model_filter=""):
         offset = (page - 1) * per_page
 
         rows = conn.execute(
-            base_sql + " ORDER BY us.id DESC LIMIT ? OFFSET ?",
+            base_sql + " ORDER BY us.created_at DESC LIMIT ? OFFSET ?",
             params + [per_page, offset]
         ).fetchall()
 
@@ -41,7 +41,7 @@ def get_user_setting_by_id(setting_id: int) -> Optional[Dict]:
     """Получить одну запись по ID"""
     with get_db_connection() as conn:
         row = conn.execute(
-            "SELECT * FROM user_settings WHERE id = ?",
+            "SELECT * FROM user_settings WHERE user_id = ?",
             (setting_id,)
         ).fetchone()
         return dict(row) if row else None
@@ -87,7 +87,7 @@ def update_user_setting(setting_id: int, data: Dict) -> bool:
                 username = ?, model = ?, preset = ?, 
                 requests_count = ?, last_request_at = ?,
                 vae = ?, lora_string = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
+            WHERE user_id = ?
         """, (
             data.get('username'),
             data.get('model'),
@@ -105,6 +105,6 @@ def update_user_setting(setting_id: int, data: Dict) -> bool:
 def delete_user_setting(setting_id: int) -> bool:
     """Удалить запись по ID"""
     with get_db_connection() as conn:
-        conn.execute("DELETE FROM user_settings WHERE id = ?", (setting_id,))
+        conn.execute("DELETE FROM user_settings WHERE user_id = ?", (setting_id,))
         conn.commit()
         return True
